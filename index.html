@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Dividen Saham</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --primary-blue: #2563EB;
+            --primary-hover: #1D4ED8;
+            --text-dark: #1E293B;
+            --text-muted: #64748B;
+            --border-color: #E2E8F0;
+            
+            /* Status Colors */
+            --status-red: #EF4444;
+            --status-yellow: #F59E0B;
+            --status-green: #10B981;
+            --status-dark-green: #047857;
+            --status-bg: #F1F5F9;
+
+            --radius: 18px;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            animation: fadeIn 0.8s ease;
+        }
+        header h1 {
+            color: var(--primary-blue);
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        header p {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        /* Card */
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow);
+            margin-bottom: 24px;
+            animation: fadeIn 0.8s ease;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Form & Inputs */
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.2s;
+            background: #F8FAFC;
+        }
+        .form-control:focus {
+            border-color: var(--primary-blue);
+            background: #FFFFFF;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+        .btn {
+            flex: 1;
+            padding: 14px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        .btn-primary {
+            background: var(--primary-blue);
+            color: white;
+        }
+        .btn-primary:hover {
+            background: var(--primary-hover);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+        }
+        .btn-outline:hover {
+            background: var(--status-bg);
+            color: var(--text-dark);
+        }
+
+        /* Result Grid */
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        .result-item {
+            background: var(--status-bg);
+            padding: 12px;
+            border-radius: 12px;
+        }
+        .result-item.full-width {
+            grid-column: span 2;
+        }
+        .result-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+        .result-value {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+        .result-value.highlight {
+            color: var(--primary-blue);
+            font-size: 18px;
+        }
+
+        /* Status Badge */
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        /* Analysis Box */
+        .analysis-box {
+            background: #EFF6FF;
+            border-left: 4px solid var(--primary-blue);
+            padding: 16px;
+            border-radius: 0 12px 12px 0;
+            font-size: 13px;
+            color: #1E3A8A;
+            margin-top: 20px;
+        }
+
+        /* Canvas */
+        .chart-container {
+            width: 100%;
+            height: 200px;
+            margin-top: 20px;
+            position: relative;
+        }
+        canvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Education & Footer */
+        .faq-item {
+            margin-bottom: 12px;
+            font-size: 13px;
+        }
+        .faq-item strong {
+            display: block;
+            color: var(--primary-blue);
+            margin-bottom: 4px;
+        }
+        .tips-list {
+            padding-left: 20px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+        
+        footer {
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 40px;
+            padding-bottom: 20px;
+        }
+        .disclaimer {
+            background: #FEF2F2;
+            color: #991B1B;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            text-align: left;
+        }
+
+        /* Error Message */
+        .error-msg {
+            color: var(--status-red);
+            font-size: 12px;
+            margin-top: 4px;
+            display: none;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Hidden logic */
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Kalkulator Dividen Saham</h1>
+        <p>Hitung estimasi dividen, Dividend Yield, Return on Cost, dan target investasi dividen dengan cepat dan akurat.</p>
+    </header>
+
+    <div class="card">
+        <div class="card-title">📊 Parameter Investasi</div>
+        
+        <div class="form-group">
+            <label for="kodeSaham">Kode Saham (Opsional)</label>
+            <input type="text" id="kodeSaham" class="form-control" placeholder="Contoh: BBCA" autocomplete="off" style="text-transform: uppercase;">
+        </div>
+
+        <div class="form-group">
+            <label for="hargaSaham">Harga Saham Saat Ini (Rp) *</label>
+            <input type="text" id="hargaSaham" class="form-control numeric-input" placeholder="0">
+            <div id="errHarga" class="error-msg">Masukkan harga yang valid.</div>
+        </div>
+
+        <div class="form-group">
+            <label for="dps">Dividen per Saham (DPS) (Rp) *</label>
+            <input type="text" id="dps" class="form-control numeric-input" placeholder="0">
+            <div id="errDps" class="error-msg">Masukkan DPS yang valid.</div>
+        </div>
+
+        <div class="form-group">
+            <label for="lot">Jumlah Lot *</label>
+            <input type="text" id="lot" class="form-control numeric-input" placeholder="0">
+            <div id="errLot" class="error-msg">Masukkan jumlah lot yang valid.</div>
+        </div>
+
+        <div class="btn-group">
+            <button class="btn btn-outline" id="btnReset">Reset</button>
+            <button class="btn btn-primary" id="btnHitung">Hitung Dividen</button>
+        </div>
+    </div>
+
+    <div id="resultCard" class="card hidden">
+        <div class="card-title">📈 Hasil Perhitungan <span id="resKode"></span></div>
+        
+        <div class="result-grid">
+            <div class="result-item">
+                <div class="result-label">Total Lembar Saham</div>
+                <div class="result-value" id="resLembar">0</div>
+            </div>
+            <div class="result-item">
+                <div class="result-label">Total Investasi</div>
+                <div class="result-value" id="resInvestasi">Rp0</div>
+            </div>
+            <div class="result-item">
+                <div class="result-label">Dividend Per Share</div>
+                <div class="result-value" id="resDps">Rp0</div>
+            </div>
+            <div class="result-item">
+                <div class="result-label">Dividend Yield</div>
+                <div class="result-value" id="resYield">0%</div>
+            </div>
+            <div class="result-item full-width" style="text-align: center;">
+                <div class="result-label">Estimasi Dividen Tahunan (Total)</div>
+                <div class="result-value highlight" id="resTotalDividen">Rp0</div>
+                <div id="yieldBadge" class="status-badge"></div>
+            </div>
+            <div class="result-item">
+                <div class="result-label">Return on Cost</div>
+                <div class="result-value" id="resRoc">0%</div>
+            </div>
+            <div class="result-item">
+                <div class="result-label">Est. Dividen Bulanan</div>
+                <div class="result-value" id="resBulanan">Rp0</div>
+            </div>
+        </div>
+
+        <div class="analysis-box" id="analysisText"></div>
+
+        <div class="chart-container">
+            <canvas id="dividendChart"></canvas>
+        </div>
+    </div>
+
+    <div id="targetCard" class="card hidden">
+        <div class="card-title">🎯 Simulasi Target Dividen</div>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+            Masukkan target dividen bulanan yang Anda inginkan berdasarkan harga saham & DPS di atas.
+        </p>
+        <div class="form-group">
+            <label for="targetBulanan">Target Dividen Bulanan (Rp)</label>
+            <input type="text" id="targetBulanan" class="form-control numeric-input" placeholder="Contoh: 5.000.000">
+        </div>
+        
+        <div id="targetResult" class="hidden" style="margin-top: 16px; background: var(--status-bg); padding: 16px; border-radius: 12px;">
+            <p style="font-size: 13px; color: var(--text-dark); margin-bottom: 12px;" id="targetDesc"></p>
+            <div class="result-grid" style="margin-bottom: 0;">
+                <div class="result-item" style="background: #fff;">
+                    <div class="result-label">Kebutuhan Lot</div>
+                    <div class="result-value" id="resTargetLot">0 Lot</div>
+                </div>
+                <div class="result-item" style="background: #fff;">
+                    <div class="result-label">Kebutuhan Lembar</div>
+                    <div class="result-value" id="resTargetLembar">0</div>
+                </div>
+                <div class="result-item full-width" style="background: #fff; text-align:center;">
+                    <div class="result-label">Estimasi Modal Dibutuhkan</div>
+                    <div class="result-value highlight" id="resTargetModal">Rp0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">📚 Belajar Dividen Saham</div>
+        <div class="faq-item">
+            <strong>Apa itu Dividen?</strong>
+            Dividen adalah pembagian laba perusahaan kepada pemegang saham sesuai jumlah saham yang dimiliki.
+        </div>
+        <div class="faq-item">
+            <strong>Apa itu DPS?</strong>
+            Dividend Per Share (DPS) adalah jumlah dividen yang diterima untuk setiap lembar saham.
+        </div>
+        <div class="faq-item">
+            <strong>Apa itu Dividend Yield?</strong>
+            Dividend Yield menunjukkan persentase dividen dibandingkan harga saham saat ini.
+        </div>
+        <div class="faq-item">
+            <strong>Apa itu Return on Cost?</strong>
+            Return on Cost menunjukkan persentase pendapatan dividen dibandingkan modal investasi yang telah dikeluarkan.
+        </div>
+        <div class="faq-item">
+            <strong>Tips Investor Dividen:</strong>
+            <ul class="tips-list">
+                <li>Jangan hanya mengejar Dividend Yield tinggi.</li>
+                <li>Perhatikan konsistensi pembagian dividen.</li>
+                <li>Analisis fundamental perusahaan.</li>
+                <li>Pastikan laba perusahaan stabil.</li>
+            </ul>
+        </div>
+    </div>
+
+    <footer>
+        <div class="disclaimer">
+            <strong>DISCLAIMER:</strong><br>
+            Perhitungan dalam aplikasi ini hanya bertujuan sebagai simulasi dan edukasi.<br>
+            Dividen tidak dijamin karena bergantung pada keputusan RUPS, kondisi keuangan perusahaan, dan kebijakan manajemen.<br>
+            Seluruh keputusan investasi merupakan tanggung jawab pengguna.<br>
+            Investasi saham memiliki risiko termasuk kehilangan sebagian atau seluruh modal.
+        </div>
+        <p>Made with ❤️ for Indonesian Investors</p>
+        <p>Version 1.0 • Last Update: <span id="lastUpdate"></span></p>
+    </footer>
+</div>
+
+<script>
+    // Utility: Format to Rupiah
+    function formatRupiah(number) {
+        if (isNaN(number) || !isFinite(number)) return "Rp0";
+        return new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }).format(number);
+    }
+
+    // Utility: Format Number for UI inputs (adds dots)
+    function formatNumberUI(val) {
+        if (!val) return "";
+        let num = cleanNumber(val.toString());
+        return new Intl.NumberFormat('id-ID').format(num);
+    }
+
+    // Utility: Clean Number (removes all non-digit characters)
+    function cleanNumber(str) {
+        return Number(str.replace(/[^0-9]/g, ''));
+    }
+
+    // Set Last Update Date
+    document.getElementById('lastUpdate').textContent = new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
+
+    // Handle Input Formatting (Auto dot on typing)
+    const numericInputs = document.querySelectorAll('.numeric-input');
+    numericInputs.forEach(input => {
+        input.addEventListener('input', function(e) {
+            let val = this.value.replace(/[^0-9]/g, '');
+            if (val !== '') {
+                this.value = formatNumberUI(val);
+            } else {
+                this.value = '';
+            }
+        });
+    });
+
+    // Main Calculator Logic
+    document.getElementById('btnHitung').addEventListener('click', calculateAll);
+
+    function calculateAll() {
+        // Reset Error Msgs
+        document.querySelectorAll('.error-msg').forEach(el => el.style.display = 'none');
+        document.querySelectorAll('.form-control').forEach(el => el.style.borderColor = 'var(--border-color)');
+
+        const kodeSaham = document.getElementById('kodeSaham').value;
+        const rawHarga = document.getElementById('hargaSaham').value;
+        const rawDps = document.getElementById('dps').value;
+        const rawLot = document.getElementById('lot').value;
+
+        const harga = cleanNumber(rawHarga);
+        const dps = cleanNumber(rawDps);
+        const lot = cleanNumber(rawLot);
+
+        let isValid = true;
+
+        if (harga <= 0 || isNaN(harga)) { showError('hargaSaham', 'errHarga'); isValid = false; }
+        if (dps <= 0 || isNaN(dps)) { showError('dps', 'errDps'); isValid = false; }
+        if (lot <= 0 || isNaN(lot)) { showError('lot', 'errLot'); isValid = false; }
+
+        if (!isValid) return;
+
+        // --- CALCULATIONS ---
+        const totalLembar = lot * 100;
+        const totalInvestasi = harga * totalLembar;
+        const totalDividen = dps * totalLembar;
+        const dividendYield = (dps / harga) * 100;
+        const returnOnCost = (totalDividen / totalInvestasi) * 100;
+        const dividenBulanan = totalDividen / 12;
+
+        // --- UPDATE UI ---
+        document.getElementById('resultCard').classList.remove('hidden');
+        document.getElementById('targetCard').classList.remove('hidden');
+        
+        document.getElementById('resKode').textContent = kodeSaham ? `(${kodeSaham.toUpperCase()})` : '';
+        document.getElementById('resLembar').textContent = new Intl.NumberFormat('id-ID').format(totalLembar);
+        document.getElementById('resInvestasi').textContent = formatRupiah(totalInvestasi);
+        document.getElementById('resDps').textContent = formatRupiah(dps);
+        document.getElementById('resTotalDividen').textContent = formatRupiah(totalDividen);
+        document.getElementById('resYield').textContent = dividendYield.toFixed(2) + '%';
+        document.getElementById('resRoc').textContent = returnOnCost.toFixed(2) + '%';
+        document.getElementById('resBulanan').textContent = formatRupiah(dividenBulanan);
+
+        // --- STATUS & ANALYSIS ---
+        const badge = document.getElementById('yieldBadge');
+        let statusText = '';
+        let bgColor = '';
+        let textColor = '#fff';
+        let analysisMsg = '';
+
+        if (dividendYield < 2) {
+            statusText = "Yield Rendah";
+            bgColor = "var(--status-red)";
+            analysisMsg = `Dividend Yield masih relatif rendah (${dividendYield.toFixed(2)}%). Pastikan tetap mempertimbangkan potensi pertumbuhan modal (capital gain) dari perusahaan dan bukan hanya besarnya dividen.`;
+        } else if (dividendYield >= 2 && dividendYield < 5) {
+            statusText = "Yield Sedang";
+            bgColor = "var(--status-yellow)";
+            textColor = "#000";
+            analysisMsg = `Dividend Yield berada di level moderat (${dividendYield.toFixed(2)}%). Ini adalah kisaran yang umum untuk perusahaan berkapitalisasi besar yang stabil.`;
+        } else if (dividendYield >= 5 && dividendYield <= 8) {
+            statusText = "Yield Menarik";
+            bgColor = "var(--status-green)";
+            analysisMsg = `Investasi sebesar ${formatRupiah(totalInvestasi)} berpotensi menghasilkan dividen sekitar ${formatRupiah(totalDividen)} per tahun dengan Dividend Yield sebesar ${dividendYield.toFixed(2)}%. Yield tersebut tergolong menarik apabila perusahaan memiliki fundamental yang sehat.`;
+        } else {
+            statusText = "Yield Sangat Menarik";
+            bgColor = "var(--status-dark-green)";
+            analysisMsg = `Dividend Yield sangat tinggi (${dividendYield.toFixed(2)}%). Investasi ${formatRupiah(totalInvestasi)} dapat menghasilkan ${formatRupiah(totalDividen)} setahun. Pastikan untuk mengecek apakah dividend payout ratio masuk akal dan laba perusahaan tidak sedang menurun drastis (value trap).`;
+        }
+
+        badge.textContent = statusText;
+        badge.style.background = bgColor;
+        badge.style.color = textColor;
+        document.getElementById('analysisText').innerHTML = `<strong>Analisis:</strong><br>${analysisMsg}`;
+
+        // Re-trigger Simulation if it has value
+        calculateTarget();
+
+        // Draw Chart
+        drawChart(totalInvestasi, totalDividen);
+    }
+
+    function showError(inputId, errId) {
+        document.getElementById(inputId).style.borderColor = 'var(--status-red)';
+        document.getElementById(errId).style.display = 'block';
+    }
+
+    // Reset Function
+    document.getElementById('btnReset').addEventListener('click', () => {
+        document.querySelectorAll('input').forEach(el => el.value = '');
+        document.querySelectorAll('.error-msg').forEach(el => el.style.display = 'none');
+        document.querySelectorAll('.form-control').forEach(el => el.style.borderColor = 'var(--border-color)');
+        document.getElementById('resultCard').classList.add('hidden');
+        document.getElementById('targetCard').classList.add('hidden');
+        document.getElementById('targetResult').classList.add('hidden');
+    });
+
+    // Target Simulation Logic
+    document.getElementById('targetBulanan').addEventListener('input', calculateTarget);
+
+    function calculateTarget() {
+        const rawTarget = document.getElementById('targetBulanan').value;
+        const targetBulanan = cleanNumber(rawTarget);
+        
+        const harga = cleanNumber(document.getElementById('hargaSaham').value);
+        const dps = cleanNumber(document.getElementById('dps').value);
+
+        if (targetBulanan > 0 && harga > 0 && dps > 0) {
+            document.getElementById('targetResult').classList.remove('hidden');
+            
+            const targetTahunan = targetBulanan * 12;
+            const lembarDibutuhkan = Math.ceil(targetTahunan / dps);
+            const lotDibutuhkan = Math.ceil(lembarDibutuhkan / 100);
+            const modalDibutuhkan = lotDibutuhkan * 100 * harga; // based on rounded lots
+
+            document.getElementById('targetDesc').innerHTML = `Untuk memperoleh estimasi dividen <strong>${formatRupiah(targetBulanan)} per bulan</strong> diperlukan sekitar:`;
+            document.getElementById('resTargetLot').textContent = new Intl.NumberFormat('id-ID').format(lotDibutuhkan) + ' Lot';
+            document.getElementById('resTargetLembar').textContent = new Intl.NumberFormat('id-ID').format(lotDibutuhkan * 100) + ' Lembar';
+            document.getElementById('resTargetModal').textContent = formatRupiah(modalDibutuhkan);
+        } else {
+            document.getElementById('targetResult').classList.add('hidden');
+        }
+    }
+
+    // Canvas Chart Animation Logic
+    let chartAnimationId;
+    function drawChart(investasi, dividen) {
+        const canvas = document.getElementById('dividendChart');
+        const ctx = canvas.getContext('2d');
+        
+        // Setup resolution for retina displays
+        const rect = canvas.parentNode.getBoundingClientRect();
+        canvas.width = rect.width * 2;
+        canvas.height = 200 * 2;
+        ctx.scale(2, 2);
+        
+        const cw = rect.width;
+        const ch = 200;
+        
+        // Animation variables
+        let progress = 0;
+        if (chartAnimationId) cancelAnimationFrame(chartAnimationId);
+
+        // Chart dimensions and styling
+        const barWidth = 60;
+        const spacing = 80;
+        const startX = (cw - (barWidth * 2 + spacing)) / 2;
+        const bottomY = ch - 30;
+
+        // Find max value to scale (investasi is always larger)
+        const maxVal = investasi;
+        const maxHeight = ch - 60; // Leave space at top for labels
+
+        function animate() {
+            progress += 0.04;
+            if (progress > 1) progress = 1;
+
+            ctx.clearRect(0, 0, cw, ch);
+
+            // Draw Base Line
+            ctx.beginPath();
+            ctx.moveTo(20, bottomY);
+            ctx.lineTo(cw - 20, bottomY);
+            ctx.strokeStyle = '#E2E8F0';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Calculate heights based on progress
+            const h1 = (investasi / maxVal) * maxHeight * progress;
+            // Ensure dividend bar has minimum height if > 0 so it's visible even if tiny compared to invest
+            let h2 = (dividen / maxVal) * maxHeight * progress;
+            if (dividen > 0 && h2 < 5) h2 = 5 * progress; 
+
+            // Draw Bar 1 (Investasi)
+            ctx.fillStyle = '#64748B'; // Muted color for investment
+            ctx.fillRect(startX, bottomY - h1, barWidth, h1);
+
+            // Draw Bar 2 (Dividen)
+            ctx.fillStyle = '#2563EB'; // Primary blue for dividend
+            ctx.fillRect(startX + barWidth + spacing, bottomY - h2, barWidth, h2);
+
+            // Draw Labels under bars
+            ctx.fillStyle = '#1E293B';
+            ctx.font = '12px Poppins, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('Investasi', startX + (barWidth/2), bottomY + 20);
+            ctx.fillText('Div. Tahunan', startX + barWidth + spacing + (barWidth/2), bottomY + 20);
+
+            // Draw Values on top of bars
+            if (progress === 1) {
+                ctx.fillStyle = '#1E293B';
+                ctx.font = '600 11px Poppins, sans-serif';
+                // Value 1
+                ctx.fillText(formatRupiahSingkat(investasi), startX + (barWidth/2), bottomY - h1 - 8);
+                // Value 2
+                ctx.fillStyle = '#2563EB';
+                ctx.fillText(formatRupiahSingkat(dividen), startX + barWidth + spacing + (barWidth/2), bottomY - h2 - 8);
+            }
+
+            if (progress < 1) {
+                chartAnimationId = requestAnimationFrame(animate);
+            }
+        }
+        animate();
+    }
+
+    // Helper for compact chart labels (e.g. 5M, 150K)
+    function formatRupiahSingkat(num) {
+        if (num >= 1e12) return 'Rp' + (num / 1e12).toFixed(1) + ' T';
+        if (num >= 1e9) return 'Rp' + (num / 1e9).toFixed(1) + ' M';
+        if (num >= 1e6) return 'Rp' + (num / 1e6).toFixed(1) + ' Jt';
+        if (num >= 1e3) return 'Rp' + (num / 1e3).toFixed(1) + ' Rb';
+        return formatRupiah(num);
+    }
+</script>
+</body>
+</html>
